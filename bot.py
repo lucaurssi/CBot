@@ -69,11 +69,17 @@ def run_discord_bot():
         if (num__of_dice <= 0 or size <= 0):
             await interaction.response.send_message(f"Dice values must be above zero")
             return
+        if (num__of_dice >100 or size > 10000):
+            await interaction.response.send_message(f"You can't possibly actually need that amount.")
             
-        result = 0
+        results = []
         for i in range(num__of_dice):
-            result = result + random.randint(1, size)
-        await interaction.response.send_message(f"you roll {num__of_dice}d{size}: {result}")
+            result = random.randint(1, size)
+            results.append(result)
+        result = 0
+        for i in results:
+            result = result + i
+        await interaction.response.send_message(f"you roll {num__of_dice}d{size}:   {result}   {results}")
 
     
     client.run(TOKEN)
