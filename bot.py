@@ -1,12 +1,14 @@
 
 import discord
+from discord import app_commands
+from discord.ext import commands
 import responses
+import random
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 def token_magic():
-    
     try:
         f = open("token.clt", "r")
         token = f.read()
@@ -28,11 +30,16 @@ async def send_message(message, response):
 
 def run_discord_bot():
     TOKEN = token_magic()
-    client = discord.Client(intents = intents)
+    client = commands.Bot(command_prefix="!", intents = intents)
 
     @client.event
     async def on_ready():
-        print(f'{client.user} has connected to Discord!')
+        print(f'{client.user.name} has connected to Discord!')
+        try:
+            synced = await client.tree.sync()
+            print(f"Synced {len(synced)} command(s)")
+        except Exception as e:
+            print(e)
     
 
     @client.event
@@ -44,12 +51,29 @@ def run_discord_bot():
         response = responses.handle_response(message)
         
         if response == -1:
-            await send_message(message, 'Shutting down...')
+            await send_message(message, "Shutting down...")
             await client.close()
             return
-        
-        if response != '':
-            await send_message(message, response)
+    
+    
+    
+    @client.tree.command(name="hello")
+    async def hello(interaction: discord.Interaction):
+        await interaction.response.send_message(f"hey there, {interaction.user.mention}!")
 
 
+    # dice command 1d6 4d10 ... ndn
+    @client.tree.command(name="roll")
+    @app_commands.describe(num__of_dice = "number of dice", size="size of the dice")
+    async def roll(interaction: discord.Interaction, num__of_dice: int, size: int):
+        if (num__of_dice <= 0 or size <= 0):
+            await interaction.response.send_message(f"Dice values must be above zero")
+            return
+            
+        result = 0
+        for i in range(num__of_dice):
+            result = result + random.randint(1, size)
+        await interaction.response.send_message(f"you roll {num__of_dice}d{size}: {result}")
+
+    
     client.run(TOKEN)
