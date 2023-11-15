@@ -2,7 +2,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-import responses
 import random
 
 intents = discord.Intents.default()
@@ -21,49 +20,42 @@ def token_magic():
         f.close()
         return token
 
-async def send_message(message, response):
-    try:
-        await message.channel.send(response)
-    except Exception as e:
-        print (e)
 
 
 def run_discord_bot():
     TOKEN = token_magic()
-    client = commands.Bot(command_prefix="!", intents = intents)
+    bot = commands.Bot(command_prefix="!", intents = intents)
 
-    @client.event
+    @bot.event
     async def on_ready():
-        print(f'{client.user.name} has connected to Discord!')
+        print(f'{bot.user.name} has connected to Discord!')
         try:
-            synced = await client.tree.sync()
+            synced = await bot.tree.sync()
             print(f"Synced {len(synced)} command(s)")
         except Exception as e:
             print(e)
     
-
-    @client.event
-    async def on_message(message):
-        if message.author == client.user:
-            return
-        
-        print(f"{message.author} said: '{message.content}' in channel: '{message.channel}'")
-        response = responses.handle_response(message)
-        
-        if response == -1:
-            await send_message(message, "Shutting down...")
-            await client.close()
-            return
     
     
-    
-    @client.tree.command(name="hello")
+    @bot.tree.command(name="hello")
     async def hello(interaction: discord.Interaction):
-        await interaction.response.send_message(f"hey there, {interaction.user.mention}!")
+        await interaction.response.send_message(f"hey there, {interaction.user.display_name}!")
+        
+    
+    
+    @bot.tree.command(name="die")
+    async def hello(interaction: discord.Interaction):
+        if str(interaction.user.name) == 'cletor':
+            await interaction.response.send_message(f"Shutting down...")
+            await bot.close()
+        else:
+            print(f"Reporting: user '{interaction.user.name}' tryed to kill bot.")
+            await interaction.response.send_message(f"Reporting user '{interaction.user.display_name}' for attempting murder.")
+
 
 
     # dice command 1d6 4d10 ... ndn
-    @client.tree.command(name="roll")
+    @bot.tree.command(name="roll")
     @app_commands.describe(num__of_dice = "number of dice", size="size of the dice")
     async def roll(interaction: discord.Interaction, num__of_dice: int, size: int):
         if (num__of_dice <= 0 or size <= 0):
@@ -79,7 +71,7 @@ def run_discord_bot():
         result = 0
         for i in results:
             result = result + i
-        await interaction.response.send_message(f"you roll {num__of_dice}d{size}:   {result}   {results}")
+        await interaction.response.send_message(f"you roll {num__of_dice}d{size}:   `{result}`   `{results}`")
 
     
-    client.run(TOKEN)
+    bot.run(TOKEN)
