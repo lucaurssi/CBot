@@ -22,8 +22,7 @@ def token_magic():
 
 
 
-def run_discord_bot():
-    TOKEN = token_magic()
+def run_discord_bot(TOKEN):
     bot = commands.Bot(command_prefix="!", intents = intents)
 
     @bot.event
