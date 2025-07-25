@@ -28,7 +28,7 @@ cd CBot/
 ```
 
 And the last step, adding your discord token to the project.
-[discord.com/developers/applications]{discord.com/developers/applications}
+[discord.com/developers/applications](discord.com/developers/applications)
 select "New Application".
 Create your bot with image, name and whatever else you need.
 when you are done, go to the 'Bot' category.
