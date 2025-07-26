@@ -1,6 +1,8 @@
 # CBot
 WIP bot, don't touch
 
+This is a Discord bot made with python.
+
 Discord bot with 3 commands:
   - hello (bot responds with "hey there *name*") 
   - roll (allows you to roll customizeble dice)
@@ -28,9 +30,10 @@ cd CBot/
 ```
 
 And the last step, adding your discord token to the project.
+
 In the discord application site:[discord.com/developers/applications](discord.com/developers/applications)
 
-select "New Application" and create your bot with image, name and whatever else you need.
+Select "New Application" and create your bot with image, name and whatever else you need.
 
 when you are done, go to the 'Bot' category, look for the Token sub-category and reset the Token.
 
