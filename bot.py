@@ -84,15 +84,47 @@ def run_discord_bot(TOKEN):
     
     @bot.event
     async def on_ready():
-        print(f'{bot.user.name} has connected to Discord!') # print on terminal
+        print('\n' + f'{bot.user.name} has connected to Discord!') # print on terminal
         try:
-            synced = await bot.tree.sync()
-            print(f"Synced {len(synced)} command(s)") 
-            
+            # synced = await bot.tree.sync()
+            # print(f"Synced {len(synced)} command(s)") 
+            print("Commands:")
             for command in bot.commands:
                 print(f"- {command.name}")
                 
         except Exception as e:
             print(e)
+    
+    # --------------------------------------------------------
+    
+    @bot.command()
+    async def status(ctx):
+        # Create the embed object
+        
+        
+        embed = discord.Embed(
+            title=ctx.author.display_name,
+            # description="This is a description for my embed.",
+            color=discord.Color.blue() # You can use hex codes or predefined colors
+        )
+
+        # Add fields
+        embed.add_field(name="Health", value="100/100", inline=True)
+        embed.add_field(name="Stamina", value="100/100", inline=True)
+        embed.add_field(name="Mana", value="100/100", inline=True)
+
+        # Set thumbnail and image
+        # embed.set_thumbnail(url="https://example.com/thumbnail.png") # Replace with a valid URL
+        # embed.set_image(url="https://example.com/image.png") # Replace with a valid URL
+
+        # Set author and footer
+        # embed.set_author(name="Bot Name", icon_url="https://example.com/author_icon.png") # Replace with valid URLs
+        # embed.set_footer(text="This is a footer.", icon_url="https://example.com/footer_icon.png") # Replace with valid URLs
+
+        # Add a timestamp
+        embed.timestamp = discord.utils.utcnow()
+
+        # Send the embed
+        await ctx.send(embed=embed)
     
     bot.run(TOKEN)
