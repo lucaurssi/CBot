@@ -8,9 +8,9 @@ intents.message_content = True
 
 '''
     TO DO list:
-    - embed GUI
-    - improve documentation on !help
     - more commands
+    - fix !roll
+    - add admin privileges (commands and such)
 '''
 
 def token_magic():
@@ -29,20 +29,58 @@ def token_magic():
 
 def run_discord_bot(TOKEN):
     bot = commands.Bot(command_prefix="!", intents = intents)
+    bot.remove_command('help')
+    
+    # ---------------------------------------------------------
+    
+    @bot.command()
+    async def help(ctx, args=None):
+        help_embed = discord.Embed(title="!help")
+        command_names_list = [x.name for x in bot.commands]
+        print(f'[{ctx.author.name}] used !help')
 
+        # If there are no arguments, just list the commands:
+        if not args:
+            help_embed.add_field(
+                name="List of supported commands:",
+                value="\n".join("- "+x.name for x in bot.commands),
+                inline=False
+            )
+            help_embed.add_field(
+                name="Details",
+                value="Type `!help <command name>` for more details about each command.",
+                inline=False
+            )
+
+        # If the argument is a command, get the help text from that command:
+        elif args in command_names_list:
+            help_embed.add_field(
+                name=args,
+                value=bot.get_command(args).description
+            )
+
+        # If someone is just trolling:
+        else:
+            help_embed.add_field(
+                name="Nope.",
+                value="Don't think I got that command, boss!"
+            )
+
+        await ctx.send(embed=help_embed)
+    
     # ---------------------------------------------------------
 
     # !hello
-    @bot.command(brief='Greets user.')
+    @bot.command(description='Greets user.')
     async def hello(ctx): # ctx --> context
-        print(f'[{ctx.author.name}] used /hello')
+        print(f'[{ctx.author.name}] used !hello')
         await ctx.send(f"hey there, {ctx.author.mention}!")
         
     
     # ---------------------------------------------------------
     
     # !die
-    @bot.command(brief='Shutdown bot if user has the permission.')
+    @bot.command(description='Shutdown bot if user has the permission.')
     async def die(ctx):
         if str(ctx.author.name) == 'cletor':
             await ctx.send(f"Shutting down...")
@@ -54,9 +92,9 @@ def run_discord_bot(TOKEN):
     # ---------------------------------------------------------
 
     # !roll
-    @bot.command(brief='Usage: !roll num__of_dice size ')
+    @bot.command(description='Usage: !roll num__of_dice size ')
     async def roll(ctx, num__of_dice, size):
-        print(f'[{ctx.author.name}] used /roll {num__of_dice}d{size}')
+        print(f'[{ctx.author.name}] used !roll {num__of_dice}d{size}')
         
         try:
             num__of_dice = int(num__of_dice)
@@ -96,8 +134,8 @@ def run_discord_bot(TOKEN):
             print(e)
     
     # --------------------------------------------------------
-    
-    @bot.command()
+    '''
+    @bot.command(description='testing command')
     async def status(ctx):
         # Create the embed object
         
@@ -126,5 +164,5 @@ def run_discord_bot(TOKEN):
 
         # Send the embed
         await ctx.send(embed=embed)
-    
+    '''
     bot.run(TOKEN)
