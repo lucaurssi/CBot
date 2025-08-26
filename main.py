@@ -1,6 +1,7 @@
 import bot
+import storage
 
 if __name__ == '__main__':
-    TOKEN = bot.token_magic()
+    TOKEN = storage.token_magic()
     
     bot.run_discord_bot(TOKEN)

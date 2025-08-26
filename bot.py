@@ -3,29 +3,16 @@ import discord
 from discord.ext import commands
 import random
 
+import storage
+
 intents = discord.Intents.default()
 intents.message_content = True
-
+privilege_list = []
 '''
     TO DO list:
     - more commands
-    - fix !roll
-    - add admin privileges (commands and such)
+    - send log to log file
 '''
-
-def token_magic():
-    try:
-        f = open("token.clt", "r")
-        token = f.read()
-        f.close()
-        return token 
-    except:
-        token = input(f' please insert your discord token: ')
-        f = open("token.clt", "w")
-        f.write(token)
-        f.close()
-        return token
-
 
 def run_discord_bot(TOKEN):
     bot = commands.Bot(command_prefix="!", intents = intents)
@@ -82,7 +69,7 @@ def run_discord_bot(TOKEN):
     # !die
     @bot.command(description='Shutdown bot if user has the permission.')
     async def die(ctx):
-        if str(ctx.author.name) == 'cletor':
+        if ctx.author.name in privilege_list:
             await ctx.send(f"Shutting down...")
             await bot.close()
         else:
@@ -92,23 +79,26 @@ def run_discord_bot(TOKEN):
     # ---------------------------------------------------------
 
     # !roll
-    @bot.command(description='Usage: !roll num__of_dice size ')
-    async def roll(ctx, num__of_dice, size):
-        print(f'[{ctx.author.name}] used !roll {num__of_dice}d{size}')
+    @bot.command(description="Usage: ' !roll XdY ', where X and Y are numbers.")
+    async def roll(ctx, dice):
+        
+        print(f'[{ctx.author.name}] used !roll {dice}')
         
         try:
+            num__of_dice, size = dice.split('d')
             num__of_dice = int(num__of_dice)
             size = int(size)
         except:
-            await ctx.send(f"Dice value must be a number '{num__of_dice}' '{size}'")
+            await ctx.send(f"Dice values must be numbers and must be separated by a ' d ' ( i.e.: !roll 1d6 )")
             return
+       
         if (num__of_dice <= 0 or size <= 0):
             await ctx.send(f"Dice values must be above zero")
             return
         if (num__of_dice >100 or size > 10000):
             await ctx.send(f"You can't possibly actually need that amount.")
             return
-            
+       
         results = []
         for i in range(num__of_dice):
             result = random.randint(1, size)
@@ -120,49 +110,45 @@ def run_discord_bot(TOKEN):
 
     # --------------------------------------------------------
     
+    # !admin
+    @bot.command(description="Usage: !admin username")
+    async def admin(ctx, user):
+        
+        global privilege_list
+        
+        if ctx.author.name in privilege_list:
+            privilege_list = storage.privilege_add(user, privilege_list)
+            await ctx.send(f" User {user} added to the list.")
+        else:
+            await ctx.send(f" You don't have the permition to use this")
+   
+    # --------------------------------------------------------
+    
+    # !deadmin
+    @bot.command(description="Removes admin from user. Usage: !deadmin username")
+    async def deadmin(ctx, user):
+        
+        global privilege_list
+        
+        if ctx.author.name in privilege_list:
+            privilege_list = storage.privilege_remove(user, privilege_list)
+            await ctx.send(f" User {user} removed from the list.")
+        else:
+            await ctx.send(f" You don't have the permition to use this")
+   
+   
     @bot.event
     async def on_ready():
-        print('\n' + f'{bot.user.name} has connected to Discord!') # print on terminal
-        try:
-            # synced = await bot.tree.sync()
-            # print(f"Synced {len(synced)} command(s)") 
-            print("Commands:")
-            for command in bot.commands:
-                print(f"- {command.name}")
-                
-        except Exception as e:
-            print(e)
-    
-    # --------------------------------------------------------
-    '''
-    @bot.command(description='testing command')
-    async def status(ctx):
-        # Create the embed object
+        print('\n' + f'{bot.user.name} Starting up...') # print on terminal
+        print(f'Token loaded.')
         
+        global privilege_list 
+        privilege_list = storage.privilege()
+        print(f'Privilege list loaded with [{len(privilege_list)}] users.') 
         
-        embed = discord.Embed(
-            title=ctx.author.display_name,
-            # description="This is a description for my embed.",
-            color=discord.Color.blue() # You can use hex codes or predefined colors
-        )
+        print(f'Commands loaded [{len(bot.commands)}].')
+        
+        print(f'Start up completed.\n')
 
-        # Add fields
-        embed.add_field(name="Health", value="100/100", inline=True)
-        embed.add_field(name="Stamina", value="100/100", inline=True)
-        embed.add_field(name="Mana", value="100/100", inline=True)
 
-        # Set thumbnail and image
-        # embed.set_thumbnail(url="https://example.com/thumbnail.png") # Replace with a valid URL
-        # embed.set_image(url="https://example.com/image.png") # Replace with a valid URL
-
-        # Set author and footer
-        # embed.set_author(name="Bot Name", icon_url="https://example.com/author_icon.png") # Replace with valid URLs
-        # embed.set_footer(text="This is a footer.", icon_url="https://example.com/footer_icon.png") # Replace with valid URLs
-
-        # Add a timestamp
-        embed.timestamp = discord.utils.utcnow()
-
-        # Send the embed
-        await ctx.send(embed=embed)
-    '''
     bot.run(TOKEN)
