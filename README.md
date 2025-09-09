@@ -35,7 +35,7 @@ when you are done, go to the 'Bot' category, look for the Token sub-category and
 
 This new token can now be used when running this repository for the first time.
 
-As a safety feature, the token file "token.clt" is selected by '.gitignore' so it doesn't go to github.
+As a safety feature, the token file "token.env" is selected by '.gitignore' so it doesn't go to github.
 
 Run the repository with:
 ```
