@@ -1,16 +1,12 @@
 # CBot
-WIP bot, don't touch
-
 This is a Discord bot made with python.
 
-Discord bot with 3 commands:
-  - hello (bot responds with "hey there *name*") 
-  - roll (allows you to roll customizeble dice)
-  - die (if you are the owner, the bot disconnect)
+Use the !help command for a list of commands.
 
+Link to add my bot to your server. (not recommended, my bot will mostly stay offline)
 Discord bot invite [link](https://discord.com/api/oauth2/authorize?client_id=1173324757085724764&permissions=1084479765568&scope=bot)
 
-## How to Compile localy
+## How to Compile localy / make your own bot
 The bot needs Discord.py that can be found at: 
 [pypi.org](https://pypi.org/project/discord.py/)
 
